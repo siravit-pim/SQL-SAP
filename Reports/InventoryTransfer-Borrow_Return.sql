@@ -1,4 +1,6 @@
 
+-- Just table Intentory tranfer
+-- 3 type OB / Borrow/ return
 ----****************************************************
 ------declare @docdatefrom as date
 ------declare @docdateto as date
