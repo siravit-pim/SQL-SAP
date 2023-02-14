@@ -32,30 +32,30 @@ select A.* from
 ,concat(isnull(DATEDIFF(day,owtr.docdate,GETDATE()),0),' ','day') N'วันที่ยืมถึงปัจจุบัน'
 ,concat(isnull(DATEDIFF(day,owtr.U_MKHDOB03,GETDATE()),0),' ','day') N'วันที่ยืมเกินจากDueDateถึงปัจจุบัน'
 ,case when OWTR.CardCode is not null then '' else OWTR.[Address] end 'Other', ''[Remark Status]
-from EuroCreation..owtr
+from xxxx..owtr
 join (select ItemCode,Dscription,FromWhsCod'WhsFrom',WhsCode'WhsTo',Price,DocEntry,U_MKRWCM01,U_MKRWCM02,U_MKRWCM03,unitMsr,UomEntry,BaseType,sum(Quantity)'QTY'
-		from EuroCreation..wtr1
+		from xxxx..wtr1
 		group by ItemCode,Dscription,FromWhsCod,WhsCode,Price,DocEntry,U_MKRWCM01,U_MKRWCM02,U_MKRWCM03,unitMsr,UomEntry,BaseType
 		) RowWTR on RowWTR.DocEntry = owtr.DocEntry
-left join EuroCreation..nnm1 on owtr.Series = nnm1.Series
+left join xxxx..nnm1 on owtr.Series = nnm1.Series
 left join (select concat(nnm1.BeginStr,max(owtr.DocNum))'DocRef',max(owtr.DocNum)'DocNum',max(owtr.docdate)'docdate',sum(wtr1.Quantity)'Quantity',owtr.U_MKHDOB06,wtr1.ItemCode			
-			from EuroCreation..owtr
-			inner join EuroCreation..wtr1 on wtr1.DocEntry = owtr.DocEntry
-			left join EuroCreation..nnm1 on nnm1.Series = owtr.Series
+			from xxxx..owtr
+			inner join xxxx..wtr1 on wtr1.DocEntry = owtr.DocEntry
+			left join xxxx..nnm1 on nnm1.Series = owtr.Series
 			where (owtr.CANCELED = 'N' and wtr1.BaseType <> 0) 
 					and (owtr.U_MKHDOB06 is not null or owtr.U_MKHDOB06 <> '') 
 					and OWTR.DocDate <= @docdateto 
 					and left(owtr.U_MKHDOB01,4) = 'TF-B'
 				group by owtr.U_MKHDOB06,wtr1.ItemCode,nnm1.BeginStr
 				) wtr on ((cast(owtr.docnum as varchar(max)) = wtr.U_MKHDOB06) or (concat(nnm1.BeginStr,owtr.DocNum) = wtr.U_MKHDOB06)) and wtr.ItemCode = RowWTR.ItemCode
-left join EuroCreation..oslp on owtr.SlpCode = oslp.SlpCode
-left join EuroCreation..[@03OBJECT] on [@03OBJECT].Code = owtr.U_MKHDOB01
-left join EuroCreation..ohem on  owtr.U_MKHDOB07 = ohem.empID
-left join EuroCreation..OITM on  RowWTR.ItemCode = OITM.ItemCode
-left join EuroCreation..OITB on  OITM.ItmsGrpCod = OITB.ItmsGrpCod
-left join EuroCreation..itm1 Plist1 on RowWTR.ItemCode = Plist1.ItemCode and RowWTR.UomEntry = Plist1.UomEntry and Plist1.PriceList = '1' --Pricelist
-left join EuroCreation..itm1 Plist2 on RowWTR.ItemCode = Plist2.ItemCode and RowWTR.UomEntry = Plist2.UomEntry and Plist2.PriceList = '2' --Pricelist
-left join EuroCreation..[@ICMT0001] on [@ICMT0001].Code = OITM.U_ICMT0001
+left join xxxx..oslp on owtr.SlpCode = oslp.SlpCode
+left join xxxx..[@03OBJECT] on [@03OBJECT].Code = owtr.U_MKHDOB01
+left join xxxx..ohem on  owtr.U_MKHDOB07 = ohem.empID
+left join xxxx..OITM on  RowWTR.ItemCode = OITM.ItemCode
+left join xxxx..OITB on  OITM.ItmsGrpCod = OITB.ItmsGrpCod
+left join xxxx..itm1 Plist1 on RowWTR.ItemCode = Plist1.ItemCode and RowWTR.UomEntry = Plist1.UomEntry and Plist1.PriceList = '1' --Pricelist
+left join xxxx..itm1 Plist2 on RowWTR.ItemCode = Plist2.ItemCode and RowWTR.UomEntry = Plist2.UomEntry and Plist2.PriceList = '2' --Pricelist
+left join xxxx..[@ICMT0001] on [@ICMT0001].Code = OITM.U_ICMT0001
 where ((owtr.CANCELED = 'N' and RowWTR.BaseType <> 0)	and isnull(owtr.U_MKHDOB06,'') = '' and left(owtr.U_MKHDOB01,4) = 'TF-B')
 		and OWTR.DocDate < @docdatefrom
 		and (ISNULL([@ICMT0001].Code,'') = isnull(nullif(@itemgroup,''),[@ICMT0001].Code) )
@@ -80,30 +80,30 @@ select INVVA1.* from
 ,concat(isnull(DATEDIFF(day,owtr.docdate,GETDATE()),0),' ','day') N'วันที่ยืมถึงปัจจุบัน'
 ,concat(isnull(DATEDIFF(day,owtr.U_MKHDOB03,GETDATE()),0),' ','day') N'วันที่ยืมเกินจากDueDateถึงปัจจุบัน'
 ,case when OWTR.CardCode is not null then '' else OWTR.[Address] end 'Other', ''[Remark Status]
-from EuroCreation..owtr
+from xxxx..owtr
 join (select ItemCode,Dscription,FromWhsCod'WhsFrom',WhsCode'WhsTo',Price,DocEntry,U_MKRWCM01,U_MKRWCM02,U_MKRWCM03,unitMsr,UomEntry,BaseType,sum(Quantity)'QTY'
-		from EuroCreation..wtr1
+		from xxxx..wtr1
 		group by ItemCode,Dscription,FromWhsCod,WhsCode,Price,DocEntry,U_MKRWCM01,U_MKRWCM02,U_MKRWCM03,unitMsr,UomEntry,BaseType
 		) RowWTR on RowWTR.DocEntry = owtr.DocEntry
-left join EuroCreation..nnm1 on owtr.Series = nnm1.Series
+left join xxxx..nnm1 on owtr.Series = nnm1.Series
 left join (select concat(nnm1.BeginStr,max(owtr.DocNum))'DocRef',max(owtr.DocNum)'DocNum',max(owtr.docdate)'docdate',sum(wtr1.Quantity)'Quantity',owtr.U_MKHDOB06,wtr1.ItemCode			
-			from EuroCreation..owtr
-			inner join EuroCreation..wtr1 on wtr1.DocEntry = owtr.DocEntry
-			left join EuroCreation..nnm1 on nnm1.Series = owtr.Series
+			from xxxx..owtr
+			inner join xxxx..wtr1 on wtr1.DocEntry = owtr.DocEntry
+			left join xxxx..nnm1 on nnm1.Series = owtr.Series
 			where (owtr.CANCELED = 'N' and wtr1.BaseType <> 0) 
 					and (owtr.U_MKHDOB06 is not null or owtr.U_MKHDOB06 <> '') 
 					and OWTR.DocDate between @docdatefrom and @docdateto
 					and left(owtr.U_MKHDOB01,4) = 'TF-B'
 				group by owtr.U_MKHDOB06,wtr1.ItemCode,nnm1.BeginStr
 				) wtr on ((cast(owtr.docnum as varchar(max)) = wtr.U_MKHDOB06) or (concat(nnm1.BeginStr,owtr.DocNum) = wtr.U_MKHDOB06)) and wtr.ItemCode = RowWTR.ItemCode
-left join EuroCreation..oslp on owtr.SlpCode = oslp.SlpCode
-left join EuroCreation..[@03OBJECT] on [@03OBJECT].Code = owtr.U_MKHDOB01
-left join EuroCreation..ohem on  owtr.U_MKHDOB07 = ohem.empID
-left join EuroCreation..OITM on  RowWTR.ItemCode = OITM.ItemCode
-left join EuroCreation..OITB on  OITM.ItmsGrpCod = OITB.ItmsGrpCod
-left join EuroCreation..itm1 Plist1 on RowWTR.ItemCode = Plist1.ItemCode and RowWTR.UomEntry = Plist1.UomEntry and Plist1.PriceList = '1' --Pricelist
-left join EuroCreation..itm1 Plist2 on RowWTR.ItemCode = Plist2.ItemCode and RowWTR.UomEntry = Plist2.UomEntry and Plist2.PriceList = '2' --Pricelist
-left join EuroCreation..[@ICMT0001] on [@ICMT0001].Code = OITM.U_ICMT0001
+left join xxxx..oslp on owtr.SlpCode = oslp.SlpCode
+left join xxxx..[@03OBJECT] on [@03OBJECT].Code = owtr.U_MKHDOB01
+left join xxxx..ohem on  owtr.U_MKHDOB07 = ohem.empID
+left join xxxx..OITM on  RowWTR.ItemCode = OITM.ItemCode
+left join xxxx..OITB on  OITM.ItmsGrpCod = OITB.ItmsGrpCod
+left join xxxx..itm1 Plist1 on RowWTR.ItemCode = Plist1.ItemCode and RowWTR.UomEntry = Plist1.UomEntry and Plist1.PriceList = '1' --Pricelist
+left join xxxx..itm1 Plist2 on RowWTR.ItemCode = Plist2.ItemCode and RowWTR.UomEntry = Plist2.UomEntry and Plist2.PriceList = '2' --Pricelist
+left join xxxx..[@ICMT0001] on [@ICMT0001].Code = OITM.U_ICMT0001
 where ((owtr.CANCELED = 'N' and RowWTR.BaseType <> 0) and isnull(owtr.U_MKHDOB06,'') = '' and left(owtr.U_MKHDOB01,4) = 'TF-B')
 		and OWTR.DocDate between @docdatefrom and @docdateto
 		and (ISNULL([@ICMT0001].Code,'') = isnull(nullif(@itemgroup,''),[@ICMT0001].Code) )
@@ -127,38 +127,37 @@ select INVVA2.* from
 ,concat(isnull(DATEDIFF(day,owtr.docdate,GETDATE()),0),' ','day') N'วันที่ยืมถึงปัจจุบัน'
 ,concat(isnull(DATEDIFF(day,owtr.U_MKHDOB03,GETDATE()),0),' ','day') N'วันที่ยืมเกินจากDueDateถึงปัจจุบัน'
 ,case when OWTR.CardCode is not null then '' else OWTR.[Address] end 'Other', ''[Remark Status]
-from EuroCreation..owtr
+from xxxx..owtr
 join (select ItemCode,Dscription,FromWhsCod'WhsFrom',WhsCode'WhsTo',Price,DocEntry,U_MKRWCM01,U_MKRWCM02,U_MKRWCM03,unitMsr,UomEntry,BaseType,sum(Quantity)'QTY'
-		from EuroCreation..wtr1
+		from xxxx..wtr1
 		group by ItemCode,Dscription,FromWhsCod,WhsCode,Price,DocEntry,U_MKRWCM01,U_MKRWCM02,U_MKRWCM03,unitMsr,UomEntry,BaseType
 		) RowWTR on RowWTR.DocEntry = owtr.DocEntry
-left join EuroCreation..nnm1 on owtr.Series = nnm1.Series
+left join xxxx..nnm1 on owtr.Series = nnm1.Series
 left join (select concat(nnm1.BeginStr,max(owtr.DocNum))'DocRef',max(owtr.DocNum)'DocNum',max(owtr.docdate)'docdate',sum(wtr1.Quantity)'Quantity',owtr.U_MKHDOB06,wtr1.ItemCode			
-			from EuroCreation..owtr
-			inner join EuroCreation..wtr1 on wtr1.DocEntry = owtr.DocEntry
-			left join EuroCreation..nnm1 on nnm1.Series = owtr.Series
+			from xxxx..owtr
+			inner join xxxx..wtr1 on wtr1.DocEntry = owtr.DocEntry
+			left join xxxx..nnm1 on nnm1.Series = owtr.Series
 			where (owtr.CANCELED = 'N' and wtr1.BaseType <> 0) 
 					and (owtr.U_MKHDOB06 is not null or owtr.U_MKHDOB06 <> '') 
 					and OWTR.DocDate between @docdatefrom and @docdateto
 					and left(owtr.U_MKHDOB01,4) = 'TF-B'
 				group by owtr.U_MKHDOB06,wtr1.ItemCode,nnm1.BeginStr
 				) wtr on ((cast(owtr.docnum as varchar(max)) = wtr.U_MKHDOB06) or (concat(nnm1.BeginStr,owtr.DocNum) = wtr.U_MKHDOB06)) and wtr.ItemCode = RowWTR.ItemCode
-left join EuroCreation..oslp on owtr.SlpCode = oslp.SlpCode
-left join EuroCreation..[@03OBJECT] on [@03OBJECT].Code = owtr.U_MKHDOB01
-left join EuroCreation..ohem on  owtr.U_MKHDOB07 = ohem.empID
-left join EuroCreation..OITM on  RowWTR.ItemCode = OITM.ItemCode
-left join EuroCreation..OITB on  OITM.ItmsGrpCod = OITB.ItmsGrpCod
-left join EuroCreation..itm1 Plist1 on RowWTR.ItemCode = Plist1.ItemCode and RowWTR.UomEntry = Plist1.UomEntry and Plist1.PriceList = '1' --Pricelist
-left join EuroCreation..itm1 Plist2 on RowWTR.ItemCode = Plist2.ItemCode and RowWTR.UomEntry = Plist2.UomEntry and Plist2.PriceList = '2' --Pricelist
-left join EuroCreation..[@ICMT0001] on [@ICMT0001].Code = OITM.U_ICMT0001
+left join xxxx..oslp on owtr.SlpCode = oslp.SlpCode
+left join xxxx..[@03OBJECT] on [@03OBJECT].Code = owtr.U_MKHDOB01
+left join xxxx..ohem on  owtr.U_MKHDOB07 = ohem.empID
+left join xxxx..OITM on  RowWTR.ItemCode = OITM.ItemCode
+left join xxxx..OITB on  OITM.ItmsGrpCod = OITB.ItmsGrpCod
+left join xxxx..itm1 Plist1 on RowWTR.ItemCode = Plist1.ItemCode and RowWTR.UomEntry = Plist1.UomEntry and Plist1.PriceList = '1' --Pricelist
+left join xxxx..itm1 Plist2 on RowWTR.ItemCode = Plist2.ItemCode and RowWTR.UomEntry = Plist2.UomEntry and Plist2.PriceList = '2' --Pricelist
+left join xxxx..[@ICMT0001] on [@ICMT0001].Code = OITM.U_ICMT0001
 where ((owtr.CANCELED = 'N' and RowWTR.BaseType <> 0) and isnull(owtr.U_MKHDOB06,'') = '' and left(owtr.U_MKHDOB01,4) = 'TF-B')
 		and OWTR.DocDate between @docdatefrom and @docdateto
 		and ( RowWTR.QTY - isnull(wtr.Quantity,0) <> 0 )	
 		and (ISNULL([@ICMT0001].Code,'') = isnull(nullif(@itemgroup,''),[@ICMT0001].Code) )
 	) INVVA2 where '2' = @Balance and ( BorrowQty - ReturnQty > 0 ) 
-		) A  ,EuroCreation..oadm where oadm.CompnyName = @database2
+		) A  ,xxxx..oadm where oadm.CompnyName = @database2
 
 ----*************************************************************************************
 
 order by [type],docnum, docdate
-
