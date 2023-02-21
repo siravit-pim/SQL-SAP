@@ -1,4 +1,5 @@
-# My storage for SAP B1 Knowledge
+# SQL section in SAP B1
+My storage for SAP B1 Knowledge
 
 ## Query
 - [Format Search](/Format_Search)
