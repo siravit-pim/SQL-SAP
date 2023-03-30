@@ -1,4 +1,4 @@
---Stock (Instock - committed) //Date
+--Stock (Instock - committed)
 select STOCK.ItemCode,STOCK.Supplytype,STOCK.Sales,STOCK.LocCode'Whs',isnull(STOCK.InStock,0) - sum(isnull(stock.Committ,0)) 'TotalStock'
 			from	(select OILM.ItemCode,isnull(oilm.OcrCode4,'')'Supplytype',isnull(oilm.OcrCode2,'')'Sales',OILM.LocCode
 					,sum(oivl.InQty) - sum(oivl.OutQty) 'InStock'
