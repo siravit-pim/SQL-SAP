@@ -1,4 +1,4 @@
--- Information about Module AP, stock and sales (AR)
+-- Information including Module AP, stock and sales (AR)
 
 ------*****************************************************************************************************************************************************
 -- create view table #1
