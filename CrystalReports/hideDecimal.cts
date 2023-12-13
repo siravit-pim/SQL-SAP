@@ -1,4 +1,4 @@
-// hide dicimal if zero point 
+// hide decimal if zero point 
 // ex. 1.00 = 1 | 9.99 = 9.99
 
 stringVar number := ToText({Command.PriceBefDi}, 2);
