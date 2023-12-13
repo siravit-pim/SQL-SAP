@@ -1,5 +1,5 @@
-switch
-    (month({PWHT.TaxDate})=1 ,"ม.ค.",
+switch (
+    month({PWHT.TaxDate})=1 ,"ม.ค.",
     month({PWHT.TaxDate})=2 ,"ก.พ.",
     month({PWHT.TaxDate})=3 ,"มี.ค.",
     month({PWHT.TaxDate})=4 ,"เม.ย.",
@@ -10,6 +10,7 @@ switch
     month({PWHT.TaxDate})=9 ,"ก.ย.",
     month({PWHT.TaxDate})=10 ,"ต.ค.",
     month({PWHT.TaxDate})=11 ,"พ.ย.",
-    month({PWHT.TaxDate})=12 ,"ธ.ค.")
+    month({PWHT.TaxDate})=12 ,"ธ.ค."
+    )
     -------------
     Year({PWHT.TaxDate})+543
