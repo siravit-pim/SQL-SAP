@@ -50,5 +50,4 @@ left join (select sum(isnull(WTQ1.Quantity,0))'TFRQty',OILM.ItemCode
 			left join XXXX..WTQ1 on (OILM.TransType = 1250000001) and (OILM.AccumType = 2) and (OILM.DocEntry = WTQ1.DocEntry) and (OILM.ItemCode = WTQ1.ItemCode) and (OILM.DocLineNum = WTQ1.LineNum) and WTQ1.LineStatus = 'O'	 										
 			where OILM.TransType = 1250000001 ----TFR
 			group by OILM.ItemCode
-			) TFR on SO.ItemCode = TFR.ItemCode 	
-
+			) TFR on SO.ItemCode = TFR.ItemCode
