@@ -33,5 +33,4 @@ Case
 	when MONTH(DocDate) = '10' then N'ตุลาคม'
 	when MONTH(DocDate) = '11' then N'พฤศจิกายน'
 	when MONTH(DocDate) = '12' then N'ธันวาคม'
-	else 'XX'
-end 'MonthDoc'
+end 'Month'
