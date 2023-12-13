@@ -8,10 +8,7 @@ else
     if HasValue({?DueDate}) AND HasUpperBound({?DueDate}) THEN 
         maximum({?DueDate}) 
     else
-        maximum({Command.INV_Date})
+        maximum({Command.INV_Date});
     
------------------------------------
-if HasValue({?group@select* from oitb where Locked = 'N'}) AND HasLowerBound({?group@select* from oitb where Locked = 'N'}) THEN 
-    minimum({?group@select* from oitb where Locked = 'N'}) 
-else 
-    minimum({Command.Item_Group})
+
+
