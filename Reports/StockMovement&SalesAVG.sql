@@ -1,46 +1,46 @@
--- Stock Movement and Sales Average
+--Stock Movement and Sales Average
+
 --declare {?@DateAt} date
 --declare {?@Month}} int
 --set {?@DateAt} = '20221101'
 --set {?@Month} = '1'
 
-; with Sales as (
-select OITW.ItemCode,OITW.WhsCode
-,CEILING( ( ( isnull(DL.AVG3,0) + isnull(INVV.AVG3,0) ) - ( isnull(Re.AVG3,0) + isnull(CN.AVG3,0) ) ) /{?@Month} ) 'Sale'
---,isnull(DL.AVG3,0) DL3,isnull(INVV.AVG3,0) INV3,isnull(Re.AVG3,0) RE3,isnull(CN.AVG3,0) CN3
-from OITW with(nolock)
-----DL
-left join (select ItemCode,WhsCode,CONVERT(DECIMAL(18,2),isnull( isnull(sum(Quantity),0) - isnull(sum(INVQ),0) ,0) ) 'AVG3'
-			from ( select a.DocEntry,a.ItemCode,a.WhsCode,a.Quantity,sum(inv.Quantity) 'INVQ'	
-					from dln1 a with(nolock) 
-					join odln b with(nolock) on a.DocEntry = b.DocEntry
-					left join (select a.Quantity,a.BaseEntry,a.BaseLine,a.ItemCode,a.WhsCode
-								from inv1 a with(nolock) join oinv b with(nolock) on a.DocEntry = b.DocEntry
-								where (b.CANCELED = 'N' and b.isIns = 'N') and (b.DocDate BETWEEN DATEADD(m,-{?@Month},{?@DateAt}) and {?@DateAt})
-								) inv on a.DocEntry = inv.BaseEntry and a.LineNum = inv.BaseLine and a.ItemCode = inv.ItemCode and a.WhsCode = inv.WhsCode
-					where b.CANCELED = 'N' and (b.DocDate BETWEEN DATEADD(m,-{?@Month},{?@DateAt}) and {?@DateAt})
-					group by a.DocEntry,a.ItemCode,a.WhsCode,a.Quantity	
-					) A1 group by ItemCode,WhsCode
-			) DL on DL.ItemCode = OITW.ItemCode and DL.WhsCode = OITW.WhsCode 
-----INV
-left join (select a.ItemCode,a.WhsCode,CONVERT(DECIMAL(18,2),sum(a.Quantity)) 'AVG3'						
-			from INV1 a with(nolock) join OINV b with(nolock) on a.DocEntry = b.DocEntry
-			where ( b.CANCELED = 'N' and b.isIns = 'N' ) and (b.DocDate BETWEEN DATEADD(m,-{?@Month},{?@DateAt}) and {?@DateAt})
-			group by ItemCode,WhsCode
-			) INVV on INVV.ItemCode = OITW.ItemCode and INVV.WhsCode = OITW.WhsCode 
-----Return
-left join (select a.ItemCode,a.WhsCode,CONVERT(DECIMAL(18,2),sum(a.Quantity)) 'AVG3'					
-			from RDN1 a with(nolock) join ORDN b with(nolock) on a.DocEntry = b.DocEntry
-			where b.CANCELED = 'N' and (b.DocDate BETWEEN DATEADD(m,-{?@Month},{?@DateAt}) and {?@DateAt})
-			group by ItemCode,WhsCode
-			) Re on Re.ItemCode = OITW.ItemCode and RE.WhsCode = OITW.WhsCode 
-----CN
-left join ( select a.ItemCode,a.WhsCode,CONVERT(DECIMAL(18,2),sum(a.Quantity)) 'AVG3'
-			from RIN1 a with(nolock) join ORIN b with(nolock) on a.DocEntry = b.DocEntry
-			where (b.CANCELED = 'N' and a.NoInvtryMv = 'N') and (b.DocDate BETWEEN DATEADD(m,-{?@Month},{?@DateAt}) and {?@DateAt}) 
-			group by ItemCode,WhsCode 	
-			) CN on CN.ItemCode = OITW.ItemCode and CN.WhsCode = OITW.WhsCode 
-	) --select * from Sales   where ItemCode =  'LCM-TPI-0017' and WhsCode = '00016RYB'
+with Sales as (
+    select OITW.ItemCode,OITW.WhsCode
+        ,CEILING( ( ( isnull(DL.AVG3,0) + isnull(INVV.AVG3,0) ) - ( isnull(Re.AVG3,0) + isnull(CN.AVG3,0) ) ) /{?@Month} ) 'Sale'
+    from OITW with(nolock)
+    ----DL
+    left join (select ItemCode,WhsCode,CONVERT(DECIMAL(18,2),isnull( isnull(sum(Quantity),0) - isnull(sum(INVQ),0) ,0) ) 'AVG3'
+                from ( select a.DocEntry,a.ItemCode,a.WhsCode,a.Quantity,sum(inv.Quantity) 'INVQ'	
+                        from dln1 a with(nolock) 
+                        join odln b with(nolock) on a.DocEntry = b.DocEntry
+                        left join (select a.Quantity,a.BaseEntry,a.BaseLine,a.ItemCode,a.WhsCode
+                                    from inv1 a with(nolock) join oinv b with(nolock) on a.DocEntry = b.DocEntry
+                                    where (b.CANCELED = 'N' and b.isIns = 'N') and (b.DocDate BETWEEN DATEADD(m,-{?@Month},{?@DateAt}) and {?@DateAt})
+                                    ) inv on a.DocEntry = inv.BaseEntry and a.LineNum = inv.BaseLine and a.ItemCode = inv.ItemCode and a.WhsCode = inv.WhsCode
+                        where b.CANCELED = 'N' and (b.DocDate BETWEEN DATEADD(m,-{?@Month},{?@DateAt}) and {?@DateAt})
+                        group by a.DocEntry,a.ItemCode,a.WhsCode,a.Quantity
+                        ) A1 group by ItemCode,WhsCode
+                ) DL on DL.ItemCode = OITW.ItemCode and DL.WhsCode = OITW.WhsCode 
+    ----INV
+    left join (select a.ItemCode,a.WhsCode,CONVERT(DECIMAL(18,2),sum(a.Quantity)) 'AVG3'						
+                from INV1 a with(nolock) join OINV b with(nolock) on a.DocEntry = b.DocEntry
+                where ( b.CANCELED = 'N' and b.isIns = 'N' ) and (b.DocDate BETWEEN DATEADD(m,-{?@Month},{?@DateAt}) and {?@DateAt})
+                group by ItemCode,WhsCode
+                ) INVV on INVV.ItemCode = OITW.ItemCode and INVV.WhsCode = OITW.WhsCode 
+    ----Return
+    left join (select a.ItemCode,a.WhsCode,CONVERT(DECIMAL(18,2),sum(a.Quantity)) 'AVG3'					
+                from RDN1 a with(nolock) join ORDN b with(nolock) on a.DocEntry = b.DocEntry
+                where b.CANCELED = 'N' and (b.DocDate BETWEEN DATEADD(m,-{?@Month},{?@DateAt}) and {?@DateAt})
+                group by ItemCode,WhsCode
+                ) Re on Re.ItemCode = OITW.ItemCode and RE.WhsCode = OITW.WhsCode 
+    ----CN
+    left join ( select a.ItemCode,a.WhsCode,CONVERT(DECIMAL(18,2),sum(a.Quantity)) 'AVG3'
+                from RIN1 a with(nolock) join ORIN b with(nolock) on a.DocEntry = b.DocEntry
+                where (b.CANCELED = 'N' and a.NoInvtryMv = 'N') and (b.DocDate BETWEEN DATEADD(m,-{?@Month},{?@DateAt}) and {?@DateAt}) 
+                group by ItemCode,WhsCode 	
+                ) CN on CN.ItemCode = OITW.ItemCode and CN.WhsCode = OITW.WhsCode 
+	) 
 select ITEM.[Item Group]
 	,item.ItmsGrpCod
 	,ITEM.ItemCode 'Item No.',ITEM.ItemName 'Item Description'
@@ -189,7 +189,7 @@ left join (select ItemCode,WhsCode,isnull(sum(Quantity),0) - isnull(sum(qty),0) 
 																group by INV1.DocEntry,INV1.ItemCode,INV1.BaseEntry,INV1.BaseLine
 															) B group by ItemCode,BaseEntry,BaseLine
 														) INV on INV.BaseEntry = DLN1.DocEntry and INV.BaseLine = DLN1.LineNum  and INV.ItemCode = DLN1.ItemCode
-											where oDLN.CANCELED = 'N' --and DLN1.ItemCode =  'LBM-XXX-0487'
+											where oDLN.CANCELED = 'N' 
 											group by DLN1.DocEntry,DLN1.ItemCode,DLN1.BaseEntry,DLN1.BaseLine,DLN1.Quantity,DLN1.BaseType
 											) A group by ItemCode,BaseEntry,BaseLine,BaseType
 									) DLN on (SO.DocEntry = DLN.BaseEntry and SO.LineNum = DLN.BaseLine) and SO.ItemCode = DLN.ItemCode and DLN.BaseType = SO.ObjType
@@ -203,7 +203,7 @@ left join (select ItemCode,WhsCode,isnull(sum(Quantity),0) - isnull(sum(qty),0) 
 														join ORIN b with(nolock) on a.DocEntry = b.DocEntry
 														where b.CANCELED = 'N' and a.NoInvtryMv = 'N'
 														) CN on CN.BaseEntry = INV1.DocEntry and CN.BaseLine = INV1.LineNum
-											where oINV.CANCELED = 'N'  and OINV.isIns = 'N' --and INV1.ItemCode =  'LBM-XXX-0487'
+											where oINV.CANCELED = 'N'  and OINV.isIns = 'N' 
 											group by INV1.DocEntry,INV1.ItemCode,INV1.BaseEntry,INV1.BaseLine,INV1.Quantity,INV1.BaseType
 											) A group by ItemCode,BaseEntry,BaseLine,BaseType
 									) INV on (SO.DocEntry = INV.BaseEntry and SO.LineNum = INV.BaseLine) and SO.ItemCode = INV.ItemCode and INV.BaseType = SO.ObjType
@@ -262,4 +262,3 @@ left join (select ItemCode,Whsto,isnull(sum(Quantity),0) - isnull(sum(qty),0) 'T
 						group by WTQ1.DocEntry,WTQ1.ItemCode,WTQ1.WhsCode,WTQ1.Quantity
 				) A group by ItemCode,WhsTo
 			) TFRto on TFRto.ItemCode = OITW.ItemCode and TFRto.WhsTo = OITW.WhsCode
---where oitw.ItemCode =  'LCM-TPI-0017' --and oitw.WhsCode = '00016RYF'
