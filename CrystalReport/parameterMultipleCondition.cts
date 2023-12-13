@@ -2,12 +2,12 @@
 // parameter can be blank about Date if more than 2 value, so make this method
 // logic statement : DocDate > DueDate > min/max(date)
 
-if HasValue({?DocDate}) AND HasUpperBound({?DocDate}) THEN 
+IF HasValue({?DocDate}) AND HasUpperBound({?DocDate}) THEN 
     maximum({?DocDate}) 
-else 
-    if HasValue({?DueDate}) AND HasUpperBound({?DueDate}) THEN 
+ELSE 
+    IF HasValue({?DueDate}) AND HasUpperBound({?DueDate}) THEN 
         maximum({?DueDate}) 
-    else
+    ELSE
         maximum({Command.INV_Date});
     
 
