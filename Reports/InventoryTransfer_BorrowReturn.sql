@@ -1,39 +1,52 @@
+-- Inventory Transfer 3 type - OB | Borrow | Return
 
--- Just table Intentory tranfer
--- 3 type OB / Borrow/ return
-----****************************************************
-------declare @docdatefrom as date
-------declare @docdateto as date
-	declare @database2 as nvarchar(200)
-------declare @Balance as nvarchar(1)
-------declare @itemgroup as nvarchar(1)
-------set @docdatefrom = '20220401'
-------set @docdateto = '20220430'
-	-- declare @empsales nvarchar(100)
-	set @database2 = 'XXXXXX'
-------set @Balance = '2'
-------set @itemgroup = ''
-----****************************************************
+--declare @docdatefrom as date
+--declare @docdateto as date
+--declare @Balance as nvarchar(1)
+--declare @itemgroup as nvarchar(1)
+--declare @empsales nvarchar(100)
+declare @database2 as nvarchar(200)
+set @database2 = 'XXXXXX'
+--set @docdatefrom = '20220401'
+--set @docdateto = '20220430'
+--set @Balance = '2'
+--set @itemgroup = ''
 
 select A.* from 
 (select OBBA1.* from 
 (select 'OB' as 'Type'
-,case   when RowWTR.U_MKRWCM01 is not null then RowWTR.U_MKRWCM01 
+    ,case   when RowWTR.U_MKRWCM01 is not null then RowWTR.U_MKRWCM01 
 		when RowWTR.U_MKRWCM02 is not null then RowWTR.U_MKRWCM02 
 		when RowWTR.U_MKRWCM03 is not null then RowWTR.U_MKRWCM03
-		else oslp.Memo end 'EMPSales'
-,concat(nnm1.BeginStr,owtr.DocNum) 'DocNum',owtr.DocDate,concat(isnull(DATEDIFF(day,owtr.docdate,owtr.U_MKHDOB03),0),' ','day') 'Date_Borrow',owtr.U_MKHDOB03 'DueDate'
-,RowWTR.ItemCode,RowWTR.Dscription,RowWTR.WhsFrom,RowWTR.WhsTo,RowWTR.unitMsr'UoM'
-,isnull(RowWTR.QTY,0) 'BorrowQty'
-,isnull(wtr.Quantity,0) 'ReturnQty'
-,IIF(isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0) < 0, 0, isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0)) 'DiffQty'
-,IIF(isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0) < 0, 0, isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0)) * 
-	Case When RowWTR.ItemCode Like 'B-%' Then (CASE WHEN Plist1.Price <> 0 THEN Plist1.Price ELSE (CASE WHEN OITM.AvgPrice <> 0 THEN OITM.AvgPrice ELSE 0 END) END)*1.05 Else isnull(Plist2.Price,0) End 'TotalPrice'
-,owtr.CardCode'BPCode',owtr.CardName'BPName',concat(OHEM.firstName,' ',OHEM.middleName,' ',OHEM.lastName)'TecName'
-,wtr.DocRef'ReverseDoc',wtr.docdate'ReverseDate',owtr.U_internal_remark'Remark1',[@03OBJECT].Name 'Remark2'
-,concat(isnull(DATEDIFF(day,owtr.docdate,GETDATE()),0),' ','day') N'วันที่ยืมถึงปัจจุบัน'
-,concat(isnull(DATEDIFF(day,owtr.U_MKHDOB03,GETDATE()),0),' ','day') N'วันที่ยืมเกินจากDueDateถึงปัจจุบัน'
-,case when OWTR.CardCode is not null then '' else OWTR.[Address] end 'Other', ''[Remark Status]
+		else oslp.Memo 
+    end 'EMPSales'
+    ,concat(nnm1.BeginStr,owtr.DocNum) 'DocNum',owtr.DocDate
+    ,concat(isnull(DATEDIFF(day,owtr.docdate,owtr.U_MKHDOB03),0),' ','day') 'Date_Borrow',owtr.U_MKHDOB03 'DueDate'
+    ,RowWTR.ItemCode,RowWTR.Dscription,RowWTR.WhsFrom,RowWTR.WhsTo,RowWTR.unitMsr'UoM'
+    ,isnull(RowWTR.QTY,0) 'BorrowQty'
+    ,isnull(wtr.Quantity,0) 'ReturnQty'
+    ,IIF(isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0) < 0, 0, isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0)) 'DiffQty'
+    ,IIF(isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0) < 0, 0, isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0)) * 
+    Case 
+        When RowWTR.ItemCode Like 'B-%' Then (
+            CASE 
+                WHEN Plist1.Price <> 0 THEN Plist1.Price 
+                ELSE (
+                    CASE 
+                        WHEN OITM.AvgPrice <> 0 THEN OITM.AvgPrice 
+                        ELSE 0 
+                    END ) 
+            END ) * 1.05 
+        Else isnull(Plist2.Price,0) 
+    End 'TotalPrice'
+    ,owtr.CardCode'BPCode',owtr.CardName'BPName',concat(OHEM.firstName,' ',OHEM.middleName,' ',OHEM.lastName)'TecName'
+    ,wtr.DocRef'ReverseDoc',wtr.docdate'ReverseDate',owtr.U_internal_remark'Remark1',[@03OBJECT].Name 'Remark2'
+    ,concat(isnull(DATEDIFF(day,owtr.docdate,GETDATE()),0),' ','day') N'วันที่ยืมถึงปัจจุบัน'
+    ,concat(isnull(DATEDIFF(day,owtr.U_MKHDOB03,GETDATE()),0),' ','day') N'วันที่ยืมเกินจากDueDateถึงปัจจุบัน'
+    ,case 
+        when OWTR.CardCode is not null then '' 
+        else OWTR.[Address] 
+    end 'Other', ''[Remark Status]
 from xxxx..owtr
 join (select ItemCode,Dscription,FromWhsCod'WhsFrom',WhsCode'WhsTo',Price,DocEntry,U_MKRWCM01,U_MKRWCM02,U_MKRWCM03,unitMsr,UomEntry,BaseType,sum(Quantity)'QTY'
 		from xxxx..wtr1
@@ -67,21 +80,38 @@ where ((owtr.CANCELED = 'N' and RowWTR.BaseType <> 0)	and isnull(owtr.U_MKHDOB06
 union all 
 select INVVA1.* from 
 (select 'zBorrow/Return' as 'Type'
-,case   when RowWTR.U_MKRWCM01 is not null then RowWTR.U_MKRWCM01 
-		when RowWTR.U_MKRWCM02 is not null then RowWTR.U_MKRWCM02 
-		when RowWTR.U_MKRWCM03 is not null then RowWTR.U_MKRWCM03
-		else oslp.Memo end 'EMPSales'
-,concat(nnm1.BeginStr,owtr.DocNum) 'DocNum',owtr.DocDate,concat(isnull(DATEDIFF(day,owtr.docdate,owtr.U_MKHDOB03),0),' ','day') 'Date_Borrow',owtr.U_MKHDOB03 'DueDate'
-,RowWTR.ItemCode,RowWTR.Dscription,RowWTR.WhsFrom,RowWTR.WhsTo,RowWTR.unitMsr'UoM'
-,isnull(RowWTR.QTY,0) 'BorrowQty',isnull(wtr.Quantity,0) 'ReturnQty'
-,IIF(isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0) < 0, 0, isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0)) 'DiffQty'
-,IIF(isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0) < 0, 0, isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0)) * 
- Case When RowWTR.ItemCode Like 'B-%' Then (CASE WHEN Plist1.Price <> 0 THEN Plist1.Price ELSE (CASE WHEN OITM.AvgPrice <> 0 THEN OITM.AvgPrice ELSE 0 END) END)*1.05 Else isnull(Plist2.Price,0) End 'TotalPrice'
-,owtr.CardCode'BPCode',owtr.CardName'BPName',concat(OHEM.firstName,' ',OHEM.middleName,' ',OHEM.lastName)'TecName'
-,wtr.DocRef'ReverseDoc',wtr.docdate'ReverseDate',owtr.U_internal_remark'Remark1',[@03OBJECT].Name 'Remark2'
-,concat(isnull(DATEDIFF(day,owtr.docdate,GETDATE()),0),' ','day') N'วันที่ยืมถึงปัจจุบัน'
-,concat(isnull(DATEDIFF(day,owtr.U_MKHDOB03,GETDATE()),0),' ','day') N'วันที่ยืมเกินจากDueDateถึงปัจจุบัน'
-,case when OWTR.CardCode is not null then '' else OWTR.[Address] end 'Other', ''[Remark Status]
+    ,case  
+        when RowWTR.U_MKRWCM01 is not null then RowWTR.U_MKRWCM01 
+        when RowWTR.U_MKRWCM02 is not null then RowWTR.U_MKRWCM02 
+        when RowWTR.U_MKRWCM03 is not null then RowWTR.U_MKRWCM03
+        else oslp.Memo 
+    end 'EMPSales'
+    ,concat(nnm1.BeginStr,owtr.DocNum) 'DocNum',owtr.DocDate
+    ,concat(isnull(DATEDIFF(day,owtr.docdate,owtr.U_MKHDOB03),0),' ','day') 'Date_Borrow',owtr.U_MKHDOB03 'DueDate'
+    ,RowWTR.ItemCode,RowWTR.Dscription,RowWTR.WhsFrom,RowWTR.WhsTo,RowWTR.unitMsr'UoM'
+    ,isnull(RowWTR.QTY,0) 'BorrowQty',isnull(wtr.Quantity,0) 'ReturnQty'
+    ,IIF(isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0) < 0, 0, isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0)) 'DiffQty'
+    ,IIF(isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0) < 0, 0, isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0)) * 
+    Case 
+        When RowWTR.ItemCode Like 'B-%' Then (
+            CASE 
+                WHEN Plist1.Price <> 0 THEN Plist1.Price 
+                ELSE (
+                    CASE 
+                        WHEN OITM.AvgPrice <> 0 THEN OITM.AvgPrice 
+                        ELSE 0 
+                    END ) 
+            END ) *1.05 
+        Else isnull(Plist2.Price,0) 
+    End 'TotalPrice'
+    ,owtr.CardCode'BPCode',owtr.CardName'BPName',concat(OHEM.firstName,' ',OHEM.middleName,' ',OHEM.lastName)'TecName'
+    ,wtr.DocRef'ReverseDoc',wtr.docdate'ReverseDate',owtr.U_internal_remark'Remark1',[@03OBJECT].Name 'Remark2'
+    ,concat(isnull(DATEDIFF(day,owtr.docdate,GETDATE()),0),' ','day') N'วันที่ยืมถึงปัจจุบัน'
+    ,concat(isnull(DATEDIFF(day,owtr.U_MKHDOB03,GETDATE()),0),' ','day') N'วันที่ยืมเกินจากDueDateถึงปัจจุบัน'
+    ,case 
+        when OWTR.CardCode is not null then '' 
+        else OWTR.[Address] 
+    end 'Other', ''[Remark Status]
 from xxxx..owtr
 join (select ItemCode,Dscription,FromWhsCod'WhsFrom',WhsCode'WhsTo',Price,DocEntry,U_MKRWCM01,U_MKRWCM02,U_MKRWCM03,unitMsr,UomEntry,BaseType,sum(Quantity)'QTY'
 		from xxxx..wtr1
@@ -115,20 +145,38 @@ where ((owtr.CANCELED = 'N' and RowWTR.BaseType <> 0) and isnull(owtr.U_MKHDOB06
 union all 
 select INVVA2.* from 
 (select 'zBorrow/Return' as 'Type'
-,case   when RowWTR.U_MKRWCM01 is not null then RowWTR.U_MKRWCM01 
-		when RowWTR.U_MKRWCM02 is not null then RowWTR.U_MKRWCM02 
-		when RowWTR.U_MKRWCM03 is not null then RowWTR.U_MKRWCM03
-		else oslp.Memo end 'EMPSales'
-,concat(nnm1.BeginStr,owtr.DocNum) 'DocNum',owtr.DocDate,concat(isnull(DATEDIFF(day,owtr.docdate,owtr.U_MKHDOB03),0),' ','day') 'Date_Borrow',owtr.U_MKHDOB03 'DueDate'
-,RowWTR.ItemCode,RowWTR.Dscription,RowWTR.WhsFrom,RowWTR.WhsTo,RowWTR.unitMsr'UoM'
-,isnull(RowWTR.QTY,0) 'BorrowQty',isnull(wtr.Quantity,0) 'ReturnQty'
-,IIF(isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0) < 0, 0, isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0)) 'DiffQty'
-,IIF(isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0) < 0, 0, isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0)) * Case When RowWTR.ItemCode Like 'B-%' Then (CASE WHEN Plist1.Price <> 0 THEN Plist1.Price ELSE (CASE WHEN OITM.AvgPrice <> 0 THEN OITM.AvgPrice ELSE 0 END) END)*1.05 Else isnull(Plist2.Price,0) End 'TotalPrice'
-,owtr.CardCode'BPCode',owtr.CardName'BPName',concat(OHEM.firstName,' ',OHEM.middleName,' ',OHEM.lastName)'TecName'
-,wtr.DocRef'ReverseDoc',wtr.docdate'ReverseDate',owtr.U_internal_remark'Remark1',[@03OBJECT].Name 'Remark2'
-,concat(isnull(DATEDIFF(day,owtr.docdate,GETDATE()),0),' ','day') N'วันที่ยืมถึงปัจจุบัน'
-,concat(isnull(DATEDIFF(day,owtr.U_MKHDOB03,GETDATE()),0),' ','day') N'วันที่ยืมเกินจากDueDateถึงปัจจุบัน'
-,case when OWTR.CardCode is not null then '' else OWTR.[Address] end 'Other', ''[Remark Status]
+    ,case   
+        when RowWTR.U_MKRWCM01 is not null then RowWTR.U_MKRWCM01 
+        when RowWTR.U_MKRWCM02 is not null then RowWTR.U_MKRWCM02 
+        when RowWTR.U_MKRWCM03 is not null then RowWTR.U_MKRWCM03
+        else oslp.Memo 
+    end 'EMPSales'
+    ,concat(nnm1.BeginStr,owtr.DocNum) 'DocNum',owtr.DocDate
+    ,concat(isnull(DATEDIFF(day,owtr.docdate,owtr.U_MKHDOB03),0),' ','day') 'Date_Borrow',owtr.U_MKHDOB03 'DueDate'
+    ,RowWTR.ItemCode,RowWTR.Dscription,RowWTR.WhsFrom,RowWTR.WhsTo,RowWTR.unitMsr'UoM'
+    ,isnull(RowWTR.QTY,0) 'BorrowQty',isnull(wtr.Quantity,0) 'ReturnQty'
+    ,IIF(isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0) < 0, 0, isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0)) 'DiffQty'
+    ,IIF(isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0) < 0, 0, isnull(RowWTR.QTY,0) - isnull(wtr.Quantity,0)) * 
+    Case 
+        When RowWTR.ItemCode Like 'B-%' Then (
+            CASE 
+                WHEN Plist1.Price <> 0 THEN Plist1.Price 
+                ELSE (
+                    CASE 
+                        WHEN OITM.AvgPrice <> 0 THEN OITM.AvgPrice 
+                        ELSE 0 
+                    END ) 
+            END )*1.05
+        Else isnull(Plist2.Price,0) 
+    End 'TotalPrice'
+    ,owtr.CardCode'BPCode',owtr.CardName'BPName',concat(OHEM.firstName,' ',OHEM.middleName,' ',OHEM.lastName)'TecName'
+    ,wtr.DocRef'ReverseDoc',wtr.docdate'ReverseDate',owtr.U_internal_remark'Remark1',[@03OBJECT].Name 'Remark2'
+    ,concat(isnull(DATEDIFF(day,owtr.docdate,GETDATE()),0),' ','day') N'วันที่ยืมถึงปัจจุบัน'
+    ,concat(isnull(DATEDIFF(day,owtr.U_MKHDOB03,GETDATE()),0),' ','day') N'วันที่ยืมเกินจากDueDateถึงปัจจุบัน'
+    ,case 
+        when OWTR.CardCode is not null then '' 
+        else OWTR.[Address] 
+    end 'Other', ''[Remark Status]
 from xxxx..owtr
 join (select ItemCode,Dscription,FromWhsCod'WhsFrom',WhsCode'WhsTo',Price,DocEntry,U_MKRWCM01,U_MKRWCM02,U_MKRWCM03,unitMsr,UomEntry,BaseType,sum(Quantity)'QTY'
 		from xxxx..wtr1
@@ -160,6 +208,4 @@ where ((owtr.CANCELED = 'N' and RowWTR.BaseType <> 0) and isnull(owtr.U_MKHDOB06
 	) INVVA2 where '2' = @Balance and ( BorrowQty - ReturnQty > 0 ) 
 		) A  ,xxxx..oadm where oadm.CompnyName = @database2
 
-----*************************************************************************************
-
-order by [type],docnum, docdate
+order by [type], docnum, docdate
