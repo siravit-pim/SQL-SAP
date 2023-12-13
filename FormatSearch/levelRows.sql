@@ -1,3 +1,4 @@
+/* Can calculate with 2 method and can use decalare in FS, it's STD */
 -- first method
 SELECT $[$38.234000373.Number] - $[$38.34.Number]
 
