@@ -16,7 +16,7 @@ WITH incremental AS (
 					ROW_NUMBER() OVER (
                             PARTITION BY "COSTCENTER_FAGLL03", "GL_ACCOUNT", "DOCNR", "GJAHR", "Month" ORDER BY "COSTCENTER_FAGLL03", "GL_ACCOUNT", "DOCNR", "GJAHR", "Month"
 					    ) AS "LineNum"
-				FROM "_SYS_BIC"."CEO_DASHBOARD/ZP_FI_FBL3N_GL_LINE_ITEM"
+				FROM "XXXXX"
 				WHERE IFNULL("COSTCENTER_FAGLL03", '') <> '' AND IFNULL("GL_ACCOUNT", '') <> '' AND HSL <> 0
 		----------------------------------
 					UNION
@@ -50,10 +50,10 @@ WITH incremental AS (
 			"Text",
             "DocNum"
 		FROM GroupCCGL2 A 
-		LEFT JOIN "BIITPL01"."DimCostElement" B ON A."CostElement" = B."CostElement"
-		LEFT JOIN "BIITPL01"."DimCostCenter" C ON A."CostCenter" = C."CostCenter"
-		LEFT JOIN "BIITPL01"."DimMachine" M ON C."MachineCode" = M."MachineCode" AND C."PlantCode" = M."PlantCode"
-		LEFT JOIN "BIITPL01"."DimPlant" P ON C."PlantCode" = P."PlantCode" OR M."PlantCode" = P."PlantCode" 	
+		LEFT JOIN "XXXXX"."DimCostElement" B ON A."CostElement" = B."CostElement"
+		LEFT JOIN "XXXXX"."DimCostCenter" C ON A."CostCenter" = C."CostCenter"
+		LEFT JOIN "XXXXX"."DimMachine" M ON C."MachineCode" = M."MachineCode" AND C."PlantCode" = M."PlantCode"
+		LEFT JOIN "XXXXX"."DimPlant" P ON C."PlantCode" = P."PlantCode" OR M."PlantCode" = P."PlantCode" 	
 	) 
 	SELECT 
 		*,
