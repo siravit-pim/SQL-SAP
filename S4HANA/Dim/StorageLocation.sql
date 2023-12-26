@@ -1,4 +1,3 @@
---DimStorageLocation
 WITH incremental AS (
     SELECT 
         WERKS "Plant",
