@@ -1,20 +1,7 @@
-DROP TABLE  "BIITPL01"."DimPlant" ;
-CREATE TABLE "BIITPL01"."DimPlant" AS (
 WITH incremental As (
     SELECT 
 	    "WERKS" AS "PlantCode", 
         "NAME1" AS "PlantName",
-        CASE 
-            WHEN "WERKS" = '1000' THEN 'PP'
-    		WHEN "WERKS"='1010' THEN 'PM1'
-    		WHEN "WERKS"='1020' THEN 'PM2'
-    		WHEN "WERKS"='1030' THEN 'PM3'
-    		WHEN "WERKS"='1040' THEN 'PL'
-    		WHEN "WERKS"='1050' THEN 'PB'
-    		WHEN "WERKS"='1060' THEN 'PK'
-    		WHEN "WERKS"='1070' THEN 'PS'
-    		ELSE '' 
-    	END "PlantShortName",
         "REGIO" AS "PlantRegion",
         "ORT01" AS "PlantDistrict"
     FROM "SAPHANADB".T001W
@@ -34,4 +21,3 @@ SELECT *,
     	IFNULL("PlantDistrict",'')
 	)))) as NVARCHAR(32)) AS HASH_DIFF
 FROM incremental
-);
