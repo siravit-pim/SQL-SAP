@@ -1,0 +1,22 @@
+WITH incremental AS (
+	SELECT
+		LTRIM(A.SAKNR,0) AS "CostElement", 
+		A.TXT50 AS "CostElementName",
+		B.GLGROUP AS "CostElementGroup",
+	FROM "SAPHANADB".SKAT A
+	LEFT JOIN "SAPHANADB".ZCOXXT104 B ON A.SAKNR = B.SAKNR AND B."MANDT"='900'
+	WHERE A."MANDT"='900' and A."SPRAS"='E' AND A."KTOPL"='1000' AND (LEFT(A.SAKNR, 3) IN('005','006','008'))
+	)
+SELECT *,
+	TO_DATE(CURRENT_TIMESTAMP) AS START_DATE,
+	TO_DATE('9999-12-31') AS END_DATE,
+	1 AS ACTIVE,
+	CAST(HASH_MD5(TO_BINARY(UPPER(TRIM(' ' FROM 	
+	    IFNULL("CostElement",'') 
+	)))) as NVARCHAR(32)) AS HASH_KEY,
+	CAST(HASH_MD5(TO_BINARY(UPPER(TRIM(' ' FROM 
+		IFNULL("CostElement",'') ||
+		IFNULL("CostElementName",'') ||
+		IFNULL("CostElementGroup",'') 
+	)))) as NVARCHAR(32)) AS HASH_DIFF
+FROM incremental
