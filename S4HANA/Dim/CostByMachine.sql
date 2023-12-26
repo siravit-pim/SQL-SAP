@@ -148,9 +148,9 @@ WITH incremental AS (
 		MapGroup."GroupConversion",
 		MapGroup."Unit"
 	FROM Summarize A
-	LEFT JOIN "BIITPL01"."DimMapGroupCost" MapGroup ON  MapGroup."CostElement" = A."CostElement" OR
+	LEFT JOIN "XXXXX"."DimMapGroupCost" MapGroup ON  MapGroup."CostElement" = A."CostElement" OR
 		( SUBSTRING_REGEXPR('[^_]+' IN MapGroup."CostElement" OCCURRENCE 1) = A."CostElement" )
-	LEFT JOIN "BIITPL01"."DimProductMaster" prd ON prd."ProductCode" = LTRIM(A.Material,0)
+	LEFT JOIN "XXXXX"."DimProductMaster" prd ON prd."ProductCode" = LTRIM(A.Material,0)
 )
 SELECT 	*,
     TO_DATE(CURRENT_TIMESTAMP) AS START_DATE,
