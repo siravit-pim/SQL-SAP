@@ -4,8 +4,6 @@ My Knowledge of `SQLServer` | `SAPHANA` databases with SAP B1 | SAP S/4HANA
 
 _I have been working with SAP B1 for almost 3 years. This SQL queries has been written and successfully executed. I'm pleased to share it and would be even happier if someone gains some ideas from seeing this._ 🤜🤛
 
-  
-
 ## SAP B1
 ### Queries
 - [FormatSearch](/FormatSearch)
@@ -18,9 +16,8 @@ _I have been working with SAP B1 for almost 3 years. This SQL queries has been w
 - [Forms](/Forms)
 - [Crystal Reports](/CrystalReports)
   
-
 ## SAP S4/HANA
-try to using STD table only
+I have attempted to utilize the standard table. however, Something hard to searching and use it.
 ### DIM
 - [Calendar](/S4HANA/Dim/Calendar.sql)
 - [GLAccountMaster](/S4HANA/Dim/GLAccountMaster.sql)
@@ -32,5 +29,7 @@ try to using STD table only
 - [CostElement](/S4HANA/Dim/CostElement.sql)
 - [CostCenter](/S4HANA/Dim/CostCenter.sql)
 
-
 ### FACT
+- [Ratio](/S4HANA/Fact/Ratio.sql)
+- [ProductWeight](/S4HANA/Fact/ProductWeight.sql)
+- [Actual&Plan](/S4HANA/Fact/Actual&Plan.sql)
