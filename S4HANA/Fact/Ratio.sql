@@ -1,4 +1,3 @@
--- financial analytics
 DO
 BEGIN
 	--for loop variable declarations
@@ -57,12 +56,13 @@ BEGIN
 		"ST_Debt_LastYearQ4" Decimal(19,4)
     );
 
-    -- Loop through month
+    -- Loop through quarters
     FOR i IN 1..9999 DO 
 
 	-- Defind / representation of the year and quarter.
     currentYearQuarter := TO_NVARCHAR(currentYear) || '-' || TO_NVARCHAR(currentQuarter);
-    currentYearMonth := TO_NVARCHAR(currentYear) || TO_NVARCHAR(currentMonth);
+    currentYearMonth := TO_NVARCHAR(currentYear) || CASE WHEN currentMonth < 10 THEN '0' || TO_NVARCHAR(currentMonth) ELSE TO_NVARCHAR(currentMonth) END  ;
+    
     
 	-------------------------
     IF currentMonth = 12 THEN
@@ -84,14 +84,12 @@ BEGIN
             BREAK; -- Exits if year is more than 1 from now and month is ahead
         END IF;
 
-
 	-------------------------
-
     -- Statement logic
 		WITH Summarize AS ( -- PL
 			WITH Calculation1 AS (
 				WITH ProvideGroup AS (	
-					SELECT a.HRYID, LTRIM(B.CALENDARMONTH,0) AS "Month",
+					SELECT a.HRYID, B.CALENDARMONTH AS "Month",
 						B.FISCALYEAR || '-' || B.CALENDARQUARTER AS "Date", --a."GLAccount", a."GLAccountName", 
 						CASE 
 							WHEN a.Hlevel = 1 THEN NULL
@@ -104,9 +102,9 @@ BEGIN
 							WHEN a.Hlevel = 8 THEN a.Level7
 						END "GLGroup"
 						,SUM(b.AMOUNT) AS "Amount"
-					FROM "XXXXXXXX"."DimGLAccountMaster" A
+					FROM "XXXXX"."DimGLAccountMaster" A
 					LEFT JOIN SAPHANADB.ZPAMTGL B ON A."GLAccount" = LTRIM(B.GLACCOUNT, '0')
-					WHERE A.HRYID = '1200' AND B.Amount <> 0 AND (B.FISCALYEAR || '-' || B.CALENDARQUARTER) = :currentYearQuarter and B.FISCALYEAR || LTRIM(B.CALENDARMONTH,0) = :currentYearMonth
+					WHERE A.HRYID = '1200' AND B.Amount <> 0 AND (B.FISCALYEAR || '-' || B.CALENDARQUARTER) = :currentYearQuarter and B.FISCALYEAR || B.CALENDARMONTH = :currentYearMonth
 					GROUP BY a.HRYID,B.FISCALYEAR || '-' || B.CALENDARQUARTER, B.CALENDARMONTH ,
 						CASE WHEN a.Hlevel = 1 THEN NULL	WHEN a.Hlevel = 2 THEN a.Level1	WHEN a.Hlevel = 3 THEN a.Level2	WHEN a.Hlevel = 4 THEN a.Level3	WHEN a.Hlevel = 5 THEN a.Level4	WHEN a.Hlevel = 6 THEN a.Level5	WHEN a.Hlevel = 7 THEN a.Level6	WHEN a.Hlevel = 8 THEN a.Level7 END
 				
@@ -132,7 +130,7 @@ BEGIN
 		), --BS
 		GroupBS AS (
 				WITH ProvideGroup AS (	
-					SELECT a.HRYID, LTRIM(B.CALENDARMONTH,0) AS "Month",
+					SELECT a.HRYID, B.CALENDARMONTH AS "Month",
 					    B.FISCALYEAR || '-' || B.CALENDARQUARTER AS "Date",
 						CASE 
 							WHEN a.Hlevel = 1 THEN NULL
@@ -165,9 +163,9 @@ BEGIN
 							WHEN a.Hlevel = 8 THEN a.Level7
 						END "GLGroup",
 						SUM(b.AMOUNT) AS "Amount"
-					FROM "XXXXXXXX"."DimGLAccountMaster" A
+					FROM "XXXXX"."DimGLAccountMaster" A
 					LEFT JOIN SAPHANADB.ZPAMTGL B ON A."GLAccount" = LTRIM(B.GLACCOUNT, '0')
-					WHERE A.HRYID = '1100' AND B.Amount <> 0 AND (B.FISCALYEAR || '-' || B.CALENDARQUARTER) <= :currentYearQuarter and B.FISCALYEAR || LTRIM(B.CALENDARMONTH,0) <= :currentYearMonth
+					WHERE A.HRYID = '1100' AND B.Amount <> 0 AND (B.FISCALYEAR || '-' || B.CALENDARQUARTER) <= :currentYearQuarter and B.FISCALYEAR || B.CALENDARMONTH <= :currentYearMonth
 					GROUP BY a.HRYID,B.FISCALYEAR || '-' || B.CALENDARQUARTER, B.CALENDARMONTH 
 						,CASE WHEN a.Hlevel = 1 THEN NULL WHEN a.Hlevel = 2 THEN a.Level1 WHEN a.Hlevel = 3 THEN a.Level2	WHEN a.Hlevel = 4 THEN a.Level3	WHEN a.Hlevel = 5 THEN a.Level4	WHEN a.Hlevel = 6 THEN a.Level5	WHEN a.Hlevel = 7 THEN a.Level6	WHEN a.Hlevel = 8 THEN a.Level7 END
 						,CASE WHEN a.Hlevel = 1 THEN NULL WHEN a.Hlevel = 2 THEN NULL WHEN a.Hlevel = 3 THEN a.Level1	WHEN a.Hlevel = 4 THEN a.Level2 WHEN a.Hlevel = 5 THEN a.Level3	WHEN a.Hlevel = 6 THEN a.Level4 WHEN a.Hlevel = 7 THEN a.Level5	WHEN a.Hlevel = 8 THEN a.Level6	END
@@ -308,9 +306,9 @@ BEGIN
 
     -----------------------------------------------
      --Create table instead temp table and drop it
-	 CREATE TABLE "XXXXXXXX"."FI.FactRatio" AS (
+	 --CREATE TABLE "XXXXX"."FI.FactRatio" AS (
 		SELECT * FROM #TempFactRatio
-	)
+	--)
 	;
 		DROP TABLE #TempFactRatio;
 END;
