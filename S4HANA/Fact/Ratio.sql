@@ -9,52 +9,52 @@ BEGIN
 	--column value variable declarations
     DECLARE currentYearQuarter NVARCHAR(6);
     DECLARE currentYearMonth NVARCHAR(6);
-    DECLARE Revenue Decimal(19,9);
-	DECLARE COGS Decimal(19,9);
-	DECLARE MarkToMarketLoss Decimal(19,9);
-	DECLARE NetProfit Decimal(19,9);
-	DECLARE TotalAssets Decimal(19,9);
-	DECLARE TotalLiabilities Decimal(19,9); 
-	DECLARE TotalEquities Decimal(19,9);
-	DECLARE AssetCurrent Decimal(19,9);
-	DECLARE LiabilityCurrent Decimal(19,9);
-	DECLARE Inventories Decimal(19,9);
-	DECLARE Inventories_LastQ Decimal(19,9);
-	DECLARE Inventories_LastYearQ4 Decimal(19,9);
-	DECLARE AR Decimal(19,9);
-	DECLARE AR_LastQ Decimal(19,9);
-	DECLARE AR_LastYearQ4 Decimal(19,9);
-	DECLARE AP Decimal(19,9);
-	DECLARE AP_LastQ Decimal(19,9);
-	DECLARE AP_LastYearQ4 Decimal(19,9);
-	DECLARE ST_Debt Decimal(19,9);
-	DECLARE ST_Debt_LastQ Decimal(19,9);
-	DECLARE ST_Debt_LastYearQ4 Decimal(19,9);
+    DECLARE Revenue Decimal(19,4);
+	DECLARE COGS Decimal(19,4);
+	DECLARE MarkToMarketLoss Decimal(19,4);
+	DECLARE NetProfit Decimal(19,4);
+	DECLARE TotalAssets Decimal(19,4);
+	DECLARE TotalLiabilities Decimal(19,4); 
+	DECLARE TotalEquities Decimal(19,4);
+	DECLARE AssetCurrent Decimal(19,4);
+	DECLARE LiabilityCurrent Decimal(19,4);
+	DECLARE Inventories Decimal(19,4);
+	DECLARE Inventories_LastQ Decimal(19,4);
+	DECLARE Inventories_LastYearQ4 Decimal(19,4);
+	DECLARE AR Decimal(19,4);
+	DECLARE AR_LastQ Decimal(19,4);
+	DECLARE AR_LastYearQ4 Decimal(19,4);
+	DECLARE AP Decimal(19,4);
+	DECLARE AP_LastQ Decimal(19,4);
+	DECLARE AP_LastYearQ4 Decimal(19,4);
+	DECLARE ST_Debt Decimal(19,4);
+	DECLARE ST_Debt_LastQ Decimal(19,4);
+	DECLARE ST_Debt_LastYearQ4 Decimal(19,4);
     -- Create a temporary table to store the results
    CREATE LOCAL TEMPORARY COLUMN TABLE #TempFactRatio (
         "YearQuarter" NVARCHAR(6),
         "YearMonth" NVARCHAR(6),
-        "Revenue" Decimal(19,9),
-		"COGS" Decimal(19,9),
-		"MarkToMarketLoss" Decimal(19,9),
-		"NetProfit" Decimal(19,9),
-		"TotalAssets" Decimal(19,9),
-		"TotalLiabilities" Decimal(19,9),
-		"TotalEquities" Decimal(19,9),
-		"AssetCurrent" Decimal(19,9),
-		"LiabilityCurrent" Decimal(19,9),
-		"Inventories" Decimal(19,9),
-		"Inventories_LastQ" Decimal(19,9),
-		"Inventories_LastYearQ4" Decimal(19,9),
-		"AR" Decimal(19,9),
-		"AR_LastQ" Decimal(19,9),
-		"AR_LastYearQ4" Decimal(19,9),
-		"AP" Decimal(19,9),
-		"AP_LastQ" Decimal(19,9),
-		"AP_LastYearQ4" Decimal(19,9),
-		"ST_Debt" Decimal(19,9),
-		"ST_Debt_LastQ" Decimal(19,9),
-		"ST_Debt_LastYearQ4" Decimal(19,9)
+        "Revenue" Decimal(19,4),
+		"COGS" Decimal(19,4),
+		"MarkToMarketLoss" Decimal(19,4),
+		"NetProfit" Decimal(19,4),
+		"TotalAssets" Decimal(19,4),
+		"TotalLiabilities" Decimal(19,4),
+		"TotalEquities" Decimal(19,4),
+		"AssetCurrent" Decimal(19,4),
+		"LiabilityCurrent" Decimal(19,4),
+		"Inventories" Decimal(19,4),
+		"Inventories_LastQ" Decimal(19,4),
+		"Inventories_LastYearQ4" Decimal(19,4),
+		"AR" Decimal(19,4),
+		"AR_LastQ" Decimal(19,4),
+		"AR_LastYearQ4" Decimal(19,4),
+		"AP" Decimal(19,4),
+		"AP_LastQ" Decimal(19,4),
+		"AP_LastYearQ4" Decimal(19,4),
+		"ST_Debt" Decimal(19,4),
+		"ST_Debt_LastQ" Decimal(19,4),
+		"ST_Debt_LastYearQ4" Decimal(19,4)
     );
 
     -- Loop through month
