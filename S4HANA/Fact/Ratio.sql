@@ -1,11 +1,14 @@
+-- financial analytics
 DO
 BEGIN
 	--for loop variable declarations
 	DECLARE i INT := 1;
     DECLARE currentYear INT := 2019;
     DECLARE currentQuarter INT := 4;
+    DECLARE currentMonth INT := 12;
 	--column value variable declarations
     DECLARE currentYearQuarter NVARCHAR(6);
+    DECLARE currentYearMonth NVARCHAR(6);
     DECLARE Revenue Decimal(19,9);
 	DECLARE COGS Decimal(19,9);
 	DECLARE MarkToMarketLoss Decimal(19,9);
@@ -28,8 +31,9 @@ BEGIN
 	DECLARE ST_Debt_LastQ Decimal(19,9);
 	DECLARE ST_Debt_LastYearQ4 Decimal(19,9);
     -- Create a temporary table to store the results
-   CREATE LOCAL TEMPORARY COLUMN TABLE #TempFactRatioY (
+   CREATE LOCAL TEMPORARY COLUMN TABLE #TempFactRatio (
         "YearQuarter" NVARCHAR(6),
+        "YearMonth" NVARCHAR(6),
         "Revenue" Decimal(19,9),
 		"COGS" Decimal(19,9),
 		"MarkToMarketLoss" Decimal(19,9),
@@ -53,30 +57,41 @@ BEGIN
 		"ST_Debt_LastYearQ4" Decimal(19,9)
     );
 
-    -- Loop through quarters
-    FOR i IN 1..999 DO 
+    -- Loop through month
+    FOR i IN 1..9999 DO 
 
 	-- Defind / representation of the year and quarter.
     currentYearQuarter := TO_NVARCHAR(currentYear) || '-' || TO_NVARCHAR(currentQuarter);
+    currentYearMonth := TO_NVARCHAR(currentYear) || TO_NVARCHAR(currentMonth);
     
 	-------------------------
-    IF currentQuarter = 4 
-        THEN currentQuarter := 1;
+    IF currentMonth = 12 THEN
+        currentMonth := 1;
         currentYear := currentYear + 1;
     ELSE
-        currentQuarter := currentQuarter + 1;
-	END IF;
-		-------------------------
-		IF currentYear = YEAR(CURRENT_DATE) + 1 AND currentQuarter = RIGHT(QUARTER(CURRENT_DATE, 7), 1)
-	        THEN BREAK; -- Exits if year and Q more than 1 from now()
-		END IF;
+        currentMonth := currentMonth + 1;
+    END IF;
+    -------------------------
+        IF currentMonth >= 1 AND currentMonth <= 3 THEN currentQuarter := 1;
+        ELSEIF currentMonth >= 4 AND currentMonth <= 6 THEN currentQuarter := 2;
+        ELSEIF currentMonth >= 7 AND currentMonth <= 9 THEN currentQuarter := 3;
+        ELSEIF currentMonth >= 10 AND currentMonth <= 12 THEN currentQuarter := 4;
+        END IF;
+        -------------------------
+        IF currentYear = LEFT(QUARTER(CURRENT_DATE, 10), 4) + 1 
+           AND currentMonth = MONTH(ADD_MONTHS(CURRENT_DATE, 2))
+        THEN
+            BREAK; -- Exits if year is more than 1 from now and month is ahead
+        END IF;
+
+
 	-------------------------
 
     -- Statement logic
 		WITH Summarize AS ( -- PL
 			WITH Calculation1 AS (
 				WITH ProvideGroup AS (	
-					SELECT a.HRYID,
+					SELECT a.HRYID, LTRIM(B.CALENDARMONTH,0) AS "Month",
 						B.FISCALYEAR || '-' || B.CALENDARQUARTER AS "Date", --a."GLAccount", a."GLAccountName", 
 						CASE 
 							WHEN a.Hlevel = 1 THEN NULL
@@ -89,35 +104,36 @@ BEGIN
 							WHEN a.Hlevel = 8 THEN a.Level7
 						END "GLGroup"
 						,SUM(b.AMOUNT) AS "Amount"
-					FROM XXXXX."DimGLAccountMaster" A
+					FROM "XXXXXXXX"."DimGLAccountMaster" A
 					LEFT JOIN SAPHANADB.ZPAMTGL B ON A."GLAccount" = LTRIM(B.GLACCOUNT, '0')
-					WHERE A.HRYID = '1200' AND B.Amount <> 0 AND (B.FISCALYEAR || '-' || B.CALENDARQUARTER) = :currentYearQuarter
-					GROUP BY a.HRYID,(B.FISCALYEAR || '-' || B.CALENDARQUARTER),
+					WHERE A.HRYID = '1200' AND B.Amount <> 0 AND (B.FISCALYEAR || '-' || B.CALENDARQUARTER) = :currentYearQuarter and B.FISCALYEAR || LTRIM(B.CALENDARMONTH,0) = :currentYearMonth
+					GROUP BY a.HRYID,B.FISCALYEAR || '-' || B.CALENDARQUARTER, B.CALENDARMONTH ,
 						CASE WHEN a.Hlevel = 1 THEN NULL	WHEN a.Hlevel = 2 THEN a.Level1	WHEN a.Hlevel = 3 THEN a.Level2	WHEN a.Hlevel = 4 THEN a.Level3	WHEN a.Hlevel = 5 THEN a.Level4	WHEN a.Hlevel = 6 THEN a.Level5	WHEN a.Hlevel = 7 THEN a.Level6	WHEN a.Hlevel = 8 THEN a.Level7 END
 				
-				) SELECT HRYID,"Date",
+				) SELECT HRYID,"Date", "Month",
 					CASE WHEN "GLGroup" IN('Sale Revenue','Service Revenue') THEN -"Amount" 
 						END "Revenue",
 					CASE WHEN "GLGroup" IN('Cost of Goods Sold','Cost of Service','Depreciation (Group Cost)') THEN "Amount" 
 						END "COGS",
-					CASE WHEN "GLGroup" IN('Loss from diminution in value of inventories') THEN "Amount" 
+					CASE WHEN "GLGroup" IN('Loss from diminution in value of inventories') THEN "Amount"
 						END "Mark to Market Loss (Reverse)",
 					CASE WHEN HRYID = '1200' THEN -"Amount" 
 						END "NetProfit"
 				FROM ProvideGroup
 			) 	
-				SELECT HRYID,"Date",
+				SELECT HRYID,"Date",  "Month",
 					SUM("Revenue") AS "Revenue",
 					SUM("COGS") AS "COGS",
 					SUM("Mark to Market Loss (Reverse)") AS "Mark to Market Loss (Reverse)",
 					SUM("NetProfit") AS "NetProfit"		
 				FROM Calculation1 
-				GROUP BY HRYID, "Date"
+				GROUP BY HRYID, "Date",  "Month"
 		-----------------------------------
 		), --BS
 		GroupBS AS (
 				WITH ProvideGroup AS (	
-					SELECT a.HRYID, B.FISCALYEAR || '-' || B.CALENDARQUARTER AS "Date",
+					SELECT a.HRYID, LTRIM(B.CALENDARMONTH,0) AS "Month",
+					    B.FISCALYEAR || '-' || B.CALENDARQUARTER AS "Date",
 						CASE 
 							WHEN a.Hlevel = 1 THEN NULL
 							WHEN a.Hlevel = 2 THEN NULL
@@ -149,15 +165,15 @@ BEGIN
 							WHEN a.Hlevel = 8 THEN a.Level7
 						END "GLGroup",
 						SUM(b.AMOUNT) AS "Amount"
-					FROM XXXXX."DimGLAccountMaster" A
+					FROM "XXXXXXXX"."DimGLAccountMaster" A
 					LEFT JOIN SAPHANADB.ZPAMTGL B ON A."GLAccount" = LTRIM(B.GLACCOUNT, '0')
-					WHERE A.HRYID = '1100' AND B.Amount <> 0 AND (B.FISCALYEAR || '-' || B.CALENDARQUARTER) <= :currentYearQuarter
-					GROUP BY a.HRYID,B.FISCALYEAR || '-' || B.CALENDARQUARTER
+					WHERE A.HRYID = '1100' AND B.Amount <> 0 AND (B.FISCALYEAR || '-' || B.CALENDARQUARTER) <= :currentYearQuarter and B.FISCALYEAR || LTRIM(B.CALENDARMONTH,0) <= :currentYearMonth
+					GROUP BY a.HRYID,B.FISCALYEAR || '-' || B.CALENDARQUARTER, B.CALENDARMONTH 
 						,CASE WHEN a.Hlevel = 1 THEN NULL WHEN a.Hlevel = 2 THEN a.Level1 WHEN a.Hlevel = 3 THEN a.Level2	WHEN a.Hlevel = 4 THEN a.Level3	WHEN a.Hlevel = 5 THEN a.Level4	WHEN a.Hlevel = 6 THEN a.Level5	WHEN a.Hlevel = 7 THEN a.Level6	WHEN a.Hlevel = 8 THEN a.Level7 END
 						,CASE WHEN a.Hlevel = 1 THEN NULL WHEN a.Hlevel = 2 THEN NULL WHEN a.Hlevel = 3 THEN a.Level1	WHEN a.Hlevel = 4 THEN a.Level2 WHEN a.Hlevel = 5 THEN a.Level3	WHEN a.Hlevel = 6 THEN a.Level4 WHEN a.Hlevel = 7 THEN a.Level5	WHEN a.Hlevel = 8 THEN a.Level6	END
 						,CASE WHEN a.Hlevel = 1 THEN NULL WHEN a.Hlevel = 2 THEN NULL WHEN a.Hlevel = 3 THEN NULL	WHEN a.Hlevel = 4 THEN a.Level1	WHEN a.Hlevel = 5 THEN a.Level2 WHEN a.Hlevel = 6 THEN a.Level3 WHEN a.Hlevel = 7 THEN a.Level4	WHEN a.Hlevel = 8 THEN a.Level5	END
 				) 
-				SELECT HRYID,"Date",
+				SELECT HRYID,"Date", "Month",
 					CASE
 						WHEN "GLGroupRoot" IN('Asset','Current Asset','Non Current Asset') THEN "Amount"
 					END "TotalAssets",
@@ -212,6 +228,7 @@ BEGIN
 				FROM ProvideGroup
 			)
 			SELECT currentYearQuarter AS "YearQuarter",
+			    currentYearMonth AS "YearMonth",
 				IFNULL(PL."Revenue",0) "Revenue",
 				IFNULL(PL."COGS",0) "COGS",
 				IFNULL(PL."Mark to Market Loss (Reverse)",0) "MarkToMarketLoss",
@@ -235,6 +252,7 @@ BEGIN
 				IFNULL(SUM(BS."ST_Debt_LastYearQ4"),0) "ST_Debt_LastYearQ4"
 				INTO -- Variables storing calculated metrics
 					currentYearQuarter,
+				    currentYearMonth,
 					Revenue,
 					COGS,
 					MarkToMarketLoss,
@@ -260,8 +278,9 @@ BEGIN
 			GROUP BY IFNULL(PL."Revenue",0),IFNULL(PL."COGS",0),IFNULL(PL."Mark to Market Loss (Reverse)",0),IFNULL(PL."NetProfit",0) 
 	--------------------------------------------------------------------
 	;
-	INSERT INTO #TempFactRatioY VALUES (
+	INSERT INTO #TempFactRatio VALUES (
 			:currentYearQuarter,
+		    :currentYearMonth,
 			Revenue,
 			COGS,
 			MarkToMarketLoss,
@@ -288,9 +307,10 @@ BEGIN
 	END FOR; -- ************************************
 
     -----------------------------------------------
-    -- Create table instead temp table and drop it
-	CREATE TABLE "BIITPL01"."FI.FactRatioY" AS (
-		SELECT * FROM #TempFactRatioY
-	);
-		DROP TABLE #TempFactRatioY;
+     --Create table instead temp table and drop it
+	 CREATE TABLE "XXXXXXXX"."FI.FactRatio" AS (
+		SELECT * FROM #TempFactRatio
+	)
+	;
+		DROP TABLE #TempFactRatio;
 END;
