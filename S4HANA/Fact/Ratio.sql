@@ -306,9 +306,9 @@ BEGIN
 
     -----------------------------------------------
      --Create table instead temp table and drop it
-	 --CREATE TABLE "XXXXX"."FI.FactRatio" AS (
+	 CREATE TABLE "XXXXX"."FI.FactRatio" AS (
 		SELECT * FROM #TempFactRatio
-	--)
+	)
 	;
 		DROP TABLE #TempFactRatio;
 END;
