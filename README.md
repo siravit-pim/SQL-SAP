@@ -2,7 +2,7 @@
 
 My Knowledge of `SQLServer` | `SAPHANA` databases with SAP B1 | SAP S/4HANA
 
-_I have been working with SAP B1 for almost 3 years. This SQL queries has been written and successfully executed. I'm pleased to share it and would be even happier if someone gains some ideas from seeing this._ 🤜
+_I have been working with SAP B1 for more then 3 years and SAP S/4HANA for almost 1 year. This SQL queries has been written and successfully executed. I'm pleased to share it and would be even happier if someone gains some ideas from seeing this._ 🤜
 
 ## SAP B1
 ### Queries
